@@ -141,8 +141,9 @@ const sheets = [
 ].sort((left, right) =>
   left.name.localeCompare(right.name, "en", { numeric: true }),
 );
+const homeUrl = import.meta.env.BASE_URL;
 const topicUrl = (topic: Pick<Topic, "slug">) =>
-  "#/sheet/" + encodeURIComponent(topic.slug);
+  homeUrl + "sheet/" + encodeURIComponent(topic.slug) + "/";
 function categoryOf(slug: string) {
   return (
     categories.find((category) => category.slugs.split(" ").includes(slug))
@@ -162,7 +163,9 @@ function readSaved() {
   }
 }
 function getRoute() {
-  return window.location.hash.slice(1) || "/";
+  const { hash, pathname } = window.location;
+  if (hash.startsWith("#/")) return hash.slice(1);
+  return ("/" + pathname.slice(homeUrl.length)).replace(/\/$/, "") || "/";
 }
 function App() {
   const [route, setRoute] = useState(getRoute);
@@ -185,6 +188,8 @@ function App() {
       ? toolsTopic
       : catalog.find((item) => encodeURIComponent(item.slug) === sheetSlug);
   const isHome = route === "/";
+  const pageName = topic ? topic.name + " cheat sheet" : activeCategory?.name ??
+    (savedView ? "Saved sheets" : "Developer cheat sheets");
   const filtered = (
     savedView
       ? library.filter(
@@ -204,6 +209,12 @@ function App() {
   );
   const letters = [...new Set(catalog.map((item) => item.letter))];
 
+  useEffect(() => {
+    if (window.location.hash.startsWith("#/sheet/") && topic) {
+      window.history.replaceState(null, "", topicUrl(topic));
+    }
+    document.title = topic ? pageName + " | DevSheets" : "DevSheets — " + pageName;
+  }, [topic, pageName]);
   useEffect(() => {
     const update = () => {
       setRoute(getRoute());
@@ -246,7 +257,7 @@ function App() {
   return (
     <div className="shell">
       <aside className="sidebar">
-        <a className="brand" href="#/">
+        <a className="brand" href={homeUrl}>
           <span className="brand-icon">
             <Braces size={22} />
           </span>
@@ -269,11 +280,11 @@ function App() {
           aria-label="Main navigation"
         >
           <p className="nav-label">LIBRARY</p>
-          <a className={isHome ? "active" : ""} href="#/">
+          <a className={isHome ? "active" : ""} href={homeUrl}>
             <Grid2X2 size={17} /> Explore{" "}
             <span className="nav-count">{library.length}</span>
           </a>
-          <a className={savedView ? "active" : ""} href="#/saved">
+          <a className={savedView ? "active" : ""} href={homeUrl + "#/saved"}>
             <Bookmark size={17} /> Saved sheets{" "}
             {saved.length > 0 && (
               <span className="nav-count">{saved.length}</span>
@@ -284,7 +295,7 @@ function App() {
             <a
               key={name}
               className={activeCategory?.name === name ? "active" : ""}
-              href={"#/category/" + encodeURIComponent(name)}
+              href={homeUrl + "#/category/" + encodeURIComponent(name)}
             >
               <Icon size={17} />
               {name}
@@ -614,7 +625,7 @@ function Reference({
   const [query, setQuery] = useState("");
   useEffect(() => {
     const controller = new AbortController();
-    fetch("/references/" + encodeURIComponent(topic.slug) + ".json", {
+    fetch(homeUrl + "references/" + encodeURIComponent(topic.slug) + ".json", {
       signal: controller.signal,
     })
       .then((response) => {
@@ -666,7 +677,7 @@ function Reference({
     .filter((group) => group.rows.length);
   return (
     <section className="reference">
-      <a className="back" href="#/">
+      <a className="back" href={homeUrl}>
         <ArrowLeft size={16} /> Explore library
       </a>
       <div className="section-heading">
@@ -720,7 +731,7 @@ function Reference({
                         entry.url ? (
                           <a
                             key={entryIndex}
-                            href={entry.url}
+                            href={entry.url.startsWith("#/sheet/") ? homeUrl + entry.url.slice(2) + "/" : entry.url}
                             target={
                               entry.url.startsWith("#") ? undefined : "_blank"
                             }

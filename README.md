@@ -15,7 +15,9 @@ npm run dev
 
 Open the local URL printed by Vite, typically `http://localhost:5173`.
 
-Run `npm run build` to type-check the app and create a production build in `dist/`.
+Run `npm run build` to type-check the app and create a production build in `dist/`. The build includes HTML pages for the library and each cheat sheet. Serve `dist/` on a static host with directory indexes enabled so paths like `/sheet/git/` open their generated pages.
+
+Set `SITE_ORIGIN` to your public origin (for example, `https://example.com`) in the build environment or in `.env.production.local` to generate canonical URLs and `sitemap.xml`.
 
 ## Project structure
 
