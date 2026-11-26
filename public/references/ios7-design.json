@@ -1,0 +1,19 @@
+[
+  {
+    "section": "Screen layout",
+    "title": "iPhone dimensions",
+    "links": [
+      {"name": "iPhone 4 and 4s use a 320 × 480 point canvas at 2× scale.", "url": null, "note": true},
+      {"name": "iPhone 5, 5c, and 5s use a 320 × 568 point canvas at 2× scale.", "url": null, "note": true}
+    ]
+  },
+  {
+    "section": "Controls",
+    "title": "Spacing and artwork",
+    "links": [
+      {"name": "Use a touch target of at least 44 × 44 points.", "url": null, "note": true},
+      {"name": "A 2× image uses two pixels per point along each axis.", "url": null, "note": true},
+      {"name": "Apple Human Interface Guidelines", "url": "https://developer.apple.com/design/human-interface-guidelines"}
+    ]
+  }
+]
